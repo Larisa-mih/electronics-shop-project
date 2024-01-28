@@ -1,4 +1,7 @@
-from csv import DictReader
+import csv
+import os.path
+
+from src.Instantiatecsv import InstantiateCSVError
 
 
 class Item:
@@ -49,15 +52,20 @@ class Item:
 
     @classmethod
     def instantiate_from_csv(cls, file_name):
-        cls.all.clear()
-        with open(file_name, encoding="windows-1251") as csvfile:
-            reader = DictReader(csvfile)
-            for row in reader:
-                Item(
-                    name=row["name"],
-                    price=row["price"],
-                    quantity=cls.string_to_number(row["quantity"]),
-                )
+        if not os.path.exists(file_name):
+            raise FileNotFoundError("_Отсутствует файл item.csv_")
+        else:
+            cls.all.clear()
+            with open(file_name, newline='', encoding="windows-1251") as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    if len(row) < 3:
+                        raise InstantiateCSVError('_Файл item.csv поврежден_')
+                    else:
+                        name = row["name"]
+                        price = row["price"]
+                        quantity = cls.string_to_number(row["quantity"])
+                        cls(name, price, quantity)
 
     @staticmethod
     def string_to_number(number):

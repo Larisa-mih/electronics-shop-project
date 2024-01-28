@@ -2,7 +2,9 @@
 from src.item import Item
 from src.phone import Phone
 import pytest
-from config import OPERATIONS_PATH
+
+from src.Instantiatecsv import InstantiateCSVError
+from config import OPERATIONS_PATH, TEST_PATH, DAMAGE_PATH
 
 
 def test_calculate_total_price():
@@ -60,3 +62,14 @@ def test_value_error():
     item1 = Item("Смартфон", 10000, 20)
     with pytest.raises(TypeError, match='Нельзя складывать с другими классами, кроме Phone'):
         item1 + p
+
+
+def test_file_not_found():
+    file_name = TEST_PATH
+    with pytest.raises(FileNotFoundError, match='_Отсутствует файл item.csv_'):
+        Item.instantiate_from_csv(file_name)
+
+
+def test_file_damaged():
+    with pytest.raises(InstantiateCSVError, match='_Файл item.csv поврежден_'):
+        Item.instantiate_from_csv(DAMAGE_PATH)
